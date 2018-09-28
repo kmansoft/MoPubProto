@@ -1,0 +1,15 @@
+<resources>
+	<string name="app_name">MoPubProto</string>
+
+
+	<string name="native_icon_image">native_icon_image</string>
+	<string name="native_main_image">native_main_image</string>
+	<string name="native_privacy_information_icon_image">Privacy Information Icon image</string>
+	<string name="learn_more">Learn More</string>
+
+	<string name="ad_status_loading">Loading: %s</string>
+	<string name="ad_status_loaded">Loaded: %s</string>
+	<string name="ad_status_error">Error: %s</string>
+
+	<string name="ad_view_rebind">Rebind ad view</string>
+</resources>

@@ -1,0 +1,106 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath ANDROID_GRADLE_TOOLS_VERSION
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+		maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
+	}
+}
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
+
+    defaultConfig {
+        applicationId "org.kman.test.mopubproto"
+        minSdkVersion 23
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+			multiDexEnabled true
+		}
+
+		debug {
+			// Using multi-dex lets us override MoPub SDK classes with our own in proposed_fixes
+			// without getting Dex errors about duplicate classes
+			multiDexEnabled true
+		}
+	}
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+	dexOptions {
+		jumboMode true
+		preDexLibraries true
+	}
+
+	sourceSets {
+		main {
+			java.srcDirs = [
+				'src/main/java'
+			]
+		}
+	}
+}
+
+ext {
+	mopub_version = '5.2.0'
+
+	supportlib_version = '27.1+'
+	firebase_gms_ads_version = '15.0+'
+	multidex_version = '1.0+'
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.12'
+
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+	implementation 'com.android.support:multidex:' + multidex_version
+
+	implementation 'com.google.android.gms:play-services-base:' + firebase_gms_ads_version
+	implementation 'com.google.android.gms:play-services-ads-identifier:' + firebase_gms_ads_version
+
+	[
+		'com.mopub:mopub-sdk-banner:' + mopub_version + '@aar',
+		'com.mopub:mopub-sdk-interstitial:' + mopub_version + '@aar',
+		'com.mopub:mopub-sdk-native-static:' + mopub_version + '@aar'
+
+	].each {
+		implementation(it) {
+			transitive = true
+		}
+	}
+}
+
+project.configurations.all {
+	resolutionStrategy.eachDependency { details ->
+		if (details.requested.group == 'com.android.support'
+				&& !details.requested.name.contains('multidex') ) {
+			details.useVersion supportlib_version
+		}
+	}
+}
