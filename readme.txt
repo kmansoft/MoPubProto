@@ -2,19 +2,17 @@ Instructions to reproduce a memory leak in MoPub SDK that happens when caching M
 instances (say, orientation changes).
 
 
-1 - Put a real MoPub
+1 - Run the app
 
-2 - Run the app
+2 - Wait for the ad to load
 
-3 - Wait for the ad to load
+3 - Rotate the activity several times (say, 5 or more), waiting the ad to show (bind) each time
 
-4 - Rotate the activity several times (say, 5 or more), waiting the ad to show (bind) each time
+4 - Use Android Studio memory profiler to force GC (several times to be sure) then collect a heap dump
 
-5 - Use Android Studio memory profiler to force GC (several times to be sure) then collect a heap dump
+5 - Filter on MainActivity - you will see that all instances ever created (5 or more) are leaked
 
-6 - Filter on MainActivity - you will see that all instances ever created (5 or more) are leaked
-
-7 - Set a breakpoint in NativeAdViewHelper # getAdView, rotate the phone - inspect "static members" -> sNativeAdMap
+6 - Set a breakpoint in NativeAdViewHelper # getAdView, rotate the phone - inspect "static members" -> sNativeAdMap
 
     Even though we just forced garbage collection - sNativeAdMap will contain all ad views ever bound
 
